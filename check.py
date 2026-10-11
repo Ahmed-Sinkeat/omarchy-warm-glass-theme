@@ -37,7 +37,11 @@ assert contrast(shell["bar"]["active"], shell["bar"]["background"]) >= 3
 assert contrast(shell["bar"]["active"], palette["background"]) >= 4.5
 for surface in ("popups", "tooltip", "notifications", "menu", "launcher", "polkit", "lock"):
     assert contrast(shell[surface]["text"], shell[surface]["background"]) >= 7, surface
-assert not (root / "backgrounds").exists()
+wallpapers = [p for p in (root / "backgrounds").iterdir() if p.suffix in (".png", ".jpg")]
+assert len(wallpapers) == 18, "The selected rotation must contain all 18 wallpapers"
+for wallpaper in wallpapers:
+    signature = wallpaper.read_bytes()[:8]
+    assert signature.startswith(b"\x89PNG\r\n\x1a\n" if wallpaper.suffix == ".png" else b"\xff\xd8"), wallpaper
 assert (root / "LICENSE").is_file()
 assert not list(root.rglob("*.dmg")), "Reference downloads must stay outside the release"
 ET.parse(root / "preview.svg")
@@ -46,11 +50,37 @@ for block in re.findall(r"```(?:bash|sh)\n(.*?)```", (root / "README.md").read_t
 
 with tempfile.TemporaryDirectory(prefix="warm-glass-check-") as tmp:
     staging = Path(tmp)
+    commands = staging / "commands"
+    commands.mkdir()
+    mock = commands / "omarchy"
+    mock.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$HOME/called"\n')
+    mock.chmod(0o755)
+    home = staging / "home"
+    home.mkdir()
+    env = {**os.environ, "HOME": str(home), "PATH": str(commands) + os.pathsep + os.environ["PATH"]}
+    subprocess.run(["bash", str(root / "install-simple.sh")], env=env, check=True)
+    called = home / "called"
+    assert called.read_text().splitlines() == ["theme", "install", "https://github.com/Ahmed-Sinkeat/omarchy-warm-glass-theme.git"]
+    called.unlink()
+    theme = home / ".config/omarchy/themes/warm-glass"
+    theme.mkdir(parents=True)
+    for dangling in (False, True):
+        if dangling:
+            theme.rmdir()
+            theme.symlink_to(home / "missing")
+        result = subprocess.run(["bash", str(root / "install-simple.sh")], env=env, capture_output=True)
+        assert result.returncode != 0 and not called.exists(), "Existing setup was passed to the destructive native installer"
+    result = subprocess.run(["bash", str(root / "install-simple.sh"), "unexpected"], env=env, capture_output=True)
+    assert result.returncode != 0 and not called.exists()
+
+with tempfile.TemporaryDirectory(prefix="warm-glass-templates-") as tmp:
+    staging = Path(tmp)
     for name in ("colors.toml", "shell.toml", "icons.theme"):
         shutil.copy2(root / name, staging / name)
     shutil.copy2(root / "extras/hyprland.lua", staging / "hyprland.lua")
     subprocess.run(["luac", "-p", str(staging / "hyprland.lua")], check=True)
     subprocess.run(["bash", "-n", str(root / "install.sh")], check=True)
+    subprocess.run(["bash", "-n", str(root / "install-simple.sh")], check=True)
 
     # Run Omarchy's real generator, pointing only its staging directory at /tmp.
     generator = (omarchy / "bin/omarchy-theme-set-templates").read_text()

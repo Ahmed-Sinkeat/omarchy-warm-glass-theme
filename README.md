@@ -1,103 +1,97 @@
 # Warm Glass
 
-A warm dark Omarchy theme with charcoal surfaces, ivory text and muted gold accents.
-Inspired by [this macOS desktop](https://x.com/icanberk/status/2109031477484937571),
-adapted for Omarchy's own controls.
+A warm dark Omarchy theme: charcoal surfaces, ivory text, muted gold accents and soft transparency.
+Inspired by [this desktop](https://x.com/icanberk/status/2109031477484937571).
 
-![Warm Glass desktop with rounded terminal windows and charcoal top bar](screenshots/desktop.png)
+![Warm Glass desktop](screenshots/desktop.png)
 
-![Warm Glass application menu with Lucide icons](screenshots/menu.png)
+## Install
 
-![Warm Glass calendar panel](screenshots/calendar.png)
+For **Omarchy 4.0.0.alpha with the Quickshell shell**. Choose one option for a fresh installation.
+Both include the 18 selected wallpapers. Existing Warm Glass setups are preserved: the scripts
+stop rather than overwrite them.
 
-Screenshots show the optional full desktop setup with personal wallpapers, which are not bundled.
-See the [color palette](preview.svg).
-
-## What gets installed
-
-| Feature | Standard theme | Optional desktop setup |
-| --- | --- | --- |
-| Terminal and application palette | Yes, through Omarchy's templates | Same |
-| Charcoal bar, ivory text and gold accents | Yes | Same |
-| Surface opacity | Bar 90%; menus/panels 95%; tooltips/notifications 97% | Same |
-| File manager icon theme | Installed Yaru Wartybrown Dark | Same |
-| Lucide desktop icons and Adwaita Sans text | Existing shell fonts/icons | Yes |
-| Thick sliders, ivory toggles and popup pointers | Existing controls | Yes |
-| 18px window corners, warm borders and soft shadows | Existing window geometry | Yes |
-| Wallpapers | Keep your own | Keep your own |
-
-Text and icons stay fully opaque. Terminal fonts and prompts keep their existing configuration.
-Application tray logos come from their applications.
-
-## Standard installation
-
-Install directly from GitHub:
-
-```sh
-omarchy theme install https://github.com/Ahmed-Sinkeat/omarchy-warm-glass-theme.git
-```
-
-Omarchy names the installed theme `warm-glass`.
-The root `colors.toml`, `shell.toml` and `icons.theme` are the native theme files.
-No helper scripts run during standard installation.
-
-Omarchy regenerates application configurations from the palette. Repository-installed themes
-cannot supply Lua, terminal configuration files or VS Code extensions. The optional window
-settings live in `extras/hyprland.lua` and require the explicit setup below.
-See [Omarchy's theme documentation](https://omarchy.org/manual/making-your-own-theme/).
-
-To try only the colors from a local checkout:
-
-```sh
-mkdir -p ~/.config/omarchy/themes/warm-glass
-cp colors.toml shell.toml icons.theme ~/.config/omarchy/themes/warm-glass/
-omarchy theme set warm-glass
-```
-
-Use an unused theme directory for the local trial. This leaves your existing shell layout and controls in place.
-
-## Optional full desktop setup
-
-This setup creates a user-owned theme and shell plugin clones. Run it from a separate local
-checkout **before installing Warm Glass through the standard route**. It refuses to overwrite
-an existing Warm Glass theme/background directory, your personal bar clone, or its icon font/config.
-Existing users should keep their current setup and use the update commands below.
-
-The helpers are tested against **Omarchy 4.0.0.alpha with the Quickshell-based shell**.
-They do not support older Waybar-based releases. Patches depend on the installed shell source;
-an incompatible version should fail its checks rather than install a partial patch.
-
-Requirements in addition to Omarchy: Python 3.11+, Python FontTools, Node.js, `patch`, Lua's
-`luac`, Fontconfig tools, `g++`, `pkg-config`, Qt 6 Gui/Qml development files, `qml6`, and
-`/usr/lib/qt6/bin/qmllint`. Adwaita Sans must be installed. Helpers do not install dependencies.
-Compilation is only for the small native font check; no additional desktop service is installed.
-
-Clone a separate working copy, then run each step and keep the backup path it prints:
+Download once:
 
 ```sh
 git clone https://github.com/Ahmed-Sinkeat/omarchy-warm-glass-theme.git
 cd omarchy-warm-glass-theme
+```
+
+### Simple
+
+Colors, top bar styling and wallpapers, using Omarchy's standard theme installer:
+
+```sh
+bash install-simple.sh
+```
+
+### Full
+
+Everything above, plus Lucide desktop icons, shared menu/popup controls, rounded windows,
+warm borders, blur and shadows. This one script runs all setup steps and prints backup paths:
+
+```sh
 bash install.sh
+```
+
+The full setup keeps your current wallpaper selected. Use **Style → Background** to choose
+an included wallpaper, or cycle with `omarchy theme bg next`.
+
+<details>
+<summary>Full setup requirements and behavior</summary>
+
+Requires Python 3.11+, Python FontTools, Node.js, `patch`, Lua's `luac`, Fontconfig tools,
+`g++`, `pkg-config`, Qt 6 Gui/Qml development files, `qml6`,
+`/usr/lib/qt6/bin/qmllint` and Adwaita Sans. The script does not install packages.
+The simple option only needs Omarchy and Git.
+
+Full setup creates a local theme and user-owned shell plugin clones, then installs the
+shared controls and Lucide icon coverage, including battery states. It refuses existing
+Warm Glass theme/background directories, its icon font/config, or your personal bar clone.
+Choose full directly; installing simple first creates a theme directory that full will preserve.
+
+Existing custom plugin files can be modified after they are backed up. The setup removes the
+persistent no-gaps override, reloads Hyprland and restarts the shell. Input handlers and
+hardware commands are preserved. Save the printed backup paths; if a later step fails,
+earlier completed steps remain installed and can be undone below.
+
+Bar opacity is 90%; menus/panels 95%; tooltips/notifications 97%. Text and icons stay opaque.
+Terminal fonts and prompts keep their current settings. Tray logos come from their applications;
+file manager icons use the system's Yaru Wartybrown Dark theme. User-level shell overrides
+still take precedence. Older Waybar releases are unsupported.
+
+</details>
+
+<details>
+<summary>More screenshots</summary>
+
+![Warm Glass menu](screenshots/menu.png)
+
+![Warm Glass calendar](screenshots/calendar.png)
+
+Screenshots show the full setup. See the [color palette](preview.svg).
+
+</details>
+
+<details>
+<summary>Update an existing full setup</summary>
+
+From an updated checkout, run the applicable helper. Both preserve backups:
+
+```sh
 python3 update-controls.py --apply
 python3 update-controls.py --bar --apply
 ```
 
-The first step installs the local theme, bar clone and icon font. The second adds the shared
-controls to active panels. The third finishes icon coverage, including battery states and
-popup/menu controls. Existing custom plugin files can be modified; their previous versions
-are backed up before writing. Input handlers and hardware commands are preserved.
+Switching themes changes the palette but leaves the plugin clones and font fallback installed.
+The fallback also affects other applications requesting Adwaita Sans. Undo the full setup
+below to remove those changes.
 
-Setup preserves the current wallpaper's bytes. The controls step removes the persistent
-no-gaps override so rounded corners can take effect; its previous file is backed up.
-The bar step restarts the shell to clear imported QML caches. Omarchy's user-level
-`~/.config/omarchy/shell.toml` overrides still take precedence over the theme.
+</details>
 
-For later updates, run only the applicable `update-controls.py` command. Switching themes
-changes the palette but leaves the companion's clones and Fontconfig fallback installed.
-The fallback also affects other applications requesting Adwaita Sans. Use the undo steps
-below to restore the desktop completely.
-
-## Undo the optional setup
+<details>
+<summary>Undo the full setup</summary>
 
 These instructions apply to a fresh optional installation made with the helpers in this
 repository. Save any edits made after installation: restoring a backup replaces those files
@@ -161,19 +155,11 @@ remains there too, so keep the initial backup while it is selected. This preserv
 instead of deleting them. For a standard theme-only installation, select another theme and
 remove or archive `~/.config/omarchy/themes/warm-glass`; there are no companion changes to undo.
 
-## Wallpapers
 
-No third-party wallpapers are distributed. Put images you own or are permitted to use in
-`~/.config/omarchy/backgrounds/warm-glass/`, select one through Omarchy, and cycle with:
+</details>
 
-```sh
-omarchy theme bg next
-```
-
-The development machine's personal wallpaper rotation is excluded from Git. Its files in
-`~/Pictures/wallpapers` are never required by the published theme.
-
-## Checks and release status
+<details>
+<summary>Checks and compatibility</summary>
 
 ```sh
 python3 check.py
@@ -181,22 +167,23 @@ python3 update-controls.py
 python3 update-controls.py --bar
 ```
 
-The first command checks native file layout, contrast, TOML/JSON, actual Omarchy template
-generation, Lua syntax, installer syntax and the bar patch. The other two stage the changes
-without installing them, lint QML, and check that input handlers are unchanged. The icon check
-also verifies all mapped codepoints and the fonts selected through QML, including ordinary
-text, battery states, Arabic and supplementary Unicode. Checks do not capture screenshots.
+Checks cover native theme generation, palette contrast, TOML/JSON, Lua/Bash syntax,
+QML patches, unchanged input handlers, icon fonts, battery states and Unicode text.
+They pass against the installed version above. A fresh desktop installation and complete
+undo have not been verified end to end.
 
-The headless checks pass against the installed Omarchy version listed above. A fresh desktop
-installation and the complete undo steps have not been verified end to end.
+Standard Omarchy installation is also supported directly through
+`omarchy theme install https://github.com/Ahmed-Sinkeat/omarchy-warm-glass-theme.git`.
+Only the full script installs the optional Lua window settings and shell controls.
+See [Omarchy's theme documentation](https://omarchy.org/manual/making-your-own-theme/).
 
-## License and credits
+</details>
 
-Theme and helper code: [MIT](LICENSE), including the notice for Omarchy-derived patches.
-The fonts retain their own [Lucide ISC and Feather MIT notices](assets/icons/lucide/LICENSE);
-see [their source and build notes](assets/icons/lucide/SOURCE.md). Keep those notices with any
-redistributed fonts. [Lucide's licensing terms](https://lucide.dev/license) allow redistribution
-with the required notices.
+## Credits and license
 
-Apple SF Symbols and Apple fonts are not installed or distributed. Reference downloads have
-been moved outside this project. Yaru icons and Adwaita Sans are provided by the user's system.
+Theme/helper code: [MIT](LICENSE). Fonts: [Lucide ISC and Feather MIT](assets/icons/lucide/LICENSE),
+with [source/build notes](assets/icons/lucide/SOURCE.md). Apple fonts and SF Symbols are not included.
+Yaru icons and Adwaita Sans come from the user's system.
+
+The included wallpapers are third-party artwork, separate from the theme's MIT license.
+See [wallpaper sources and attribution status](backgrounds/README.md).

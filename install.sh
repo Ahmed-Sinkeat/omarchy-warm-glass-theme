@@ -2,6 +2,10 @@
 set -euo pipefail
 [[ $# == 0 ]] || { echo 'Usage: install.sh' >&2; exit 1; }
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+for command in omarchy omarchy-shell hyprctl python3 node patch luac fc-cache fc-query g++ pkg-config qml6; do
+  command -v "$command" >/dev/null || { echo "Missing dependency: $command" >&2; exit 1; }
+done
+pkg-config --exists Qt6Gui Qt6Qml
 python3 check.py
 python3 build-shell-icons.py
 
@@ -50,6 +54,7 @@ cp "$previous_background" "$background_dir/current-wallpaper.${previous_backgrou
 ln -nsf "$background_dir/current-wallpaper.${previous_background##*.}" "$state_dir/background"
 mkdir -p "$theme_dir"
 cp colors.toml shell.toml icons.theme extras/hyprland.lua "$theme_dir/"
+cp -r backgrounds "$theme_dir/"
 omarchy plugin clone omarchy.bar
 patch --batch --fuzz=0 --directory="$bar_dir" < bar.patch
 mkdir -p "$bar_dir/warm-ui"
@@ -67,3 +72,6 @@ omarchy-shell shell ping
 cmp "$backup_dir/wallpaper.${previous_background##*.}" "$(readlink -f "$state_dir/background")"
 trap - ERR
 echo "Warm Glass applied. Wallpaper bytes unchanged. Backup: $backup_dir"
+python3 update-controls.py --apply
+python3 update-controls.py --bar --apply
+echo 'Full Warm Glass setup complete. Cycle wallpapers with: omarchy theme bg next'
