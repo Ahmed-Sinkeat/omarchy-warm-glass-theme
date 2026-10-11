@@ -4,9 +4,14 @@ A warm dark Omarchy theme with charcoal surfaces, ivory text and muted gold acce
 Inspired by [this macOS desktop](https://x.com/icanberk/status/2109031477484937571),
 adapted for Omarchy's own controls.
 
-![Warm Glass color palette](preview.svg)
+![Warm Glass desktop with rounded terminal windows and charcoal top bar](screenshots/desktop.png)
 
-The preview shows the palette. A desktop screenshot is planned.
+![Warm Glass application menu with Lucide icons](screenshots/menu.png)
+
+![Warm Glass calendar panel](screenshots/calendar.png)
+
+Screenshots show the optional full desktop setup with personal wallpapers, which are not bundled.
+See the [color palette](preview.svg).
 
 ## What gets installed
 
@@ -183,8 +188,7 @@ also verifies all mapped codepoints and the fonts selected through QML, includin
 text, battery states, Arabic and supplementary Unicode. Checks do not capture screenshots.
 
 The headless checks pass against the installed Omarchy version listed above. A fresh desktop
-installation and the complete undo steps have not been verified end to end. Those checks and
-a desktop screenshot are still planned; the palette preview is not a desktop screenshot.
+installation and the complete undo steps have not been verified end to end.
 
 ## License and credits
 
