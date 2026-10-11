@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.DS_Store
+# Personal wallpaper selection; originals are not part of the release.
+apply-wallpapers.sh

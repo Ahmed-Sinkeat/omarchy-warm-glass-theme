@@ -1,0 +1,73 @@
+--- Bar.qml
++++ Bar.qml
+@@ -11,6 +11,7 @@
+ Item {
+   id: root
++  FontLoader { source: "warm-ui/shell-icons.ttf" }
+ 
+   // The omarchy-shell host injects omarchyPath from OMARCHY_PATH.
+   property string omarchyPath: Quickshell.env("OMARCHY_PATH")
+   // Injected by the host shell so bar slots can resolve enabled widgets.
+@@ -74,10 +74,11 @@
+   property color themeForeground: Color.bar.text
+   property color themeContrastForeground: Color.background
+   property color transparentForeground: Color.bar.text
+-  property color foreground: themeForeground
++  property color foreground: Color.foreground
+   property color barForeground: useTransparentForeground ? transparentForeground : themeForeground
+   property bool foregroundAnimationEnabled: true
+-  property color background: Color.bar.background
++  property color background: Color.background
++  property color barBackground: Color.bar.background
+   property color urgent: Color.bar.active
+ 
+   Behavior on barForeground { enabled: root.foregroundAnimationEnabled; ColorAnimation { duration: 420; easing.type: Easing.InOutCubic } }
+@@ -805,7 +806,11 @@
+     return source ? Util.fileUrl(source) : ""
+   }
+ 
+-  Component.onCompleted: applyBarConfig()
++  Component.onCompleted: {
++    // Keep desktop typography separate from the terminal's monospace alias.
++    Style.fontFamily = Qt.binding(function() { return Color.shellValues["font.family"] || "monospace" })
++    applyBarConfig()
++  }
+ 
+   // Revealing the indicators widens their section, which can slide a neighbour
+   // under a stationary pointer. Collapsing on that un-hover would move it back
+@@ -1263,7 +1268,7 @@
+ 
+     implicitWidth: root.vertical ? root.barSize : 0
+     implicitHeight: root.vertical ? 0 : root.barSize
+-    color: root.transparent ? "transparent" : root.background
++    color: root.transparent ? "transparent" : root.barBackground
+     surfaceFormat.opaque: false
+     WlrLayershell.namespace: "omarchy-bar"
+     WlrLayershell.layer: WlrLayer.Top
+@@ -1433,7 +1438,7 @@
+ 
+       BorderSurface {
+         anchors.fill: parent
+-        color: root.transparent ? "transparent" : root.background
++        color: root.transparent ? "transparent" : root.barBackground
+         borderSpec: Border.flat(root.barForeground, 1)
+         radius: Math.min(Style.cornerRadius, height / 2)
+         opacity: root.transparent ? 0.45 : 0.94
+@@ -1503,7 +1508,7 @@
+         y: modelData === "bottom" ? parent.height - edgeSize : 0
+         width: edgeVertical ? edgeSize : parent.width
+         height: edgeVertical ? parent.height : edgeSize
+-        color: root.transparent ? "transparent" : root.background
++        color: root.transparent ? "transparent" : root.barBackground
+         borderSpec: Border.flat(root.barForeground, 1)
+         visible: opacity > 0
+         opacity: root.barMoveCandidate === modelData ? (root.transparent ? 0.45 : 0.7) : 0
+@@ -1829,7 +1834,7 @@
+       visible: slot.dragSource
+       anchors.fill: parent
+       anchors.margins: Style.space(1)
+-      color: root.transparent ? "transparent" : root.background
++      color: root.transparent ? "transparent" : root.barBackground
+       borderSpec: Border.flat(root.barForeground, 1)
+       radius: Math.min(Style.cornerRadius, height / 2)
+       opacity: root.transparent ? 0.22 : 0.32

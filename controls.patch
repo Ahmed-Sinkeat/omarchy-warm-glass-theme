@@ -1,0 +1,255 @@
+--- a/PanelSlider.qml
++++ b/PanelSlider.qml
+@@ -1,8 +1,10 @@
+ import QtQuick
+ import qs.Commons
++import qs.Ui
+ 
+ Item {
+   id: root
++  readonly property bool warmGlass: Color.shellValues["warm-glass.enabled"] === "true"
+ 
+   property QtObject bar: null
+   property real value: 0
+@@ -10,12 +12,12 @@
+   property real maximum: 1
+   property real step: 0.05
+   property bool integer: false
+-  property color trackColor: bar ? Style.selectedFillFor(bar.foreground, Color.accent) : "#333"
+-  property color fillColor: bar ? bar.foreground : Color.foreground
++  property color trackColor: warmGlass ? "#191916" : (bar ? Style.selectedFillFor(bar.foreground, Color.accent) : "#333")
++  property color fillColor: warmGlass ? Color.accent : (bar ? bar.foreground : Color.foreground)
+   property color knobColor: bar ? bar.foreground : Color.foreground
+   property bool dragging: false
+-  property real trackHeight: Math.max(4, Math.round(Style.spacing.controlHeight * 0.11))
+-  property real knobSize: Math.max(14, Math.round(Style.spacing.controlHeight * 0.38))
++  property real trackHeight: warmGlass ? Style.space(30) : Math.max(4, Math.round(Style.spacing.controlHeight * 0.11))
++  property real knobSize: warmGlass ? Style.space(24) : Math.max(14, Math.round(Style.spacing.controlHeight * 0.38))
+   property real liveValue: value
+ 
+   // macOS-style notches. When > 1, that many evenly-spaced tick marks are cut
+@@ -35,7 +37,7 @@
+   signal rightClicked()
+ 
+   implicitWidth: Style.space(200)
+-  implicitHeight: Math.max(Style.space(22), knobSize + Style.spacing.md)
++  implicitHeight: Math.max(Style.space(22), trackHeight + Style.spacing.md, knobSize + Style.spacing.md)
+ 
+   readonly property real range: Math.max(0.0001, maximum - minimum)
+   readonly property real progress: Math.max(0, Math.min(1, (liveValue - minimum) / range))
+@@ -47,7 +49,9 @@
+     anchors.left: parent.left
+     anchors.right: parent.right
+     height: root.trackHeight
+-    radius: height / 2
++    radius: root.warmGlass ? Style.space(10) : height / 2
++    border.width: root.warmGlass ? 1 : 0
++    border.color: "#292923"
+     color: root.trackColor
+   }
+ 
+@@ -57,8 +61,8 @@
+     anchors.left: track.left
+     height: track.height
+     radius: track.radius
+-    color: root.fillColor
+-    width: track.width * root.progress
++    color: root.warmGlass ? Qt.darker(root.fillColor, 1.8) : root.fillColor
++    width: root.warmGlass ? (track.width - knob.width - Style.space(4)) * root.progress + knob.width + Style.space(4) : track.width * root.progress
+ 
+     Behavior on width {
+       enabled: !root.dragging
+@@ -82,14 +86,14 @@
+ 
+   BorderSurface {
+     id: knob
+-    width: root.knobSize
++    width: root.warmGlass ? Style.space(18) : root.knobSize
+     height: root.knobSize
+-    radius: root.knobSize / 2
++    radius: root.warmGlass ? Style.space(6) : root.knobSize / 2
+     color: root.knobColor
+-    borderSpec: Border.flat(root.bar ? root.bar.background : "#101315", Math.max(1, Style.space(2)))
++    borderSpec: root.warmGlass ? Border.none() : Border.flat(root.bar ? root.bar.background : "#101315", Math.max(1, Style.space(2)))
+     anchors.verticalCenter: track.verticalCenter
+-    x: Math.max(0, Math.min(track.width - width, track.width * root.progress - width / 2))
+-    scale: root._hot ? 1.15 : 1.0
++    x: root.warmGlass ? Style.space(2) + (track.width - width - Style.space(4)) * root.progress : Math.max(0, Math.min(track.width - width, track.width * root.progress - width / 2))
++    scale: root._hot ? (root.warmGlass ? 1.04 : 1.15) : 1.0
+ 
+     Behavior on x {
+       enabled: !root.dragging
+--- a/ToggleSwitch.qml
++++ b/ToggleSwitch.qml
+@@ -1,5 +1,6 @@
+ import QtQuick
+ import qs.Commons
++import qs.Ui
+ 
+ // Bare on/off switch: a track with a sliding knob and no label. This is the
+ // switch `Toggle` parks at the end of its labeled row, factored out so panel
+@@ -26,6 +27,7 @@
+ // theme: pill shape when Hyprland corners are rounded, square on sharp.
+ Item {
+   id: root
++  readonly property bool warmGlass: Color.shellValues["warm-glass.enabled"] === "true"
+ 
+   property bool checked: false
+   property bool busy: false
+@@ -39,7 +41,7 @@
+ 
+   property bool cursorRing: interactive
+   property int cursorPad: Style.space(6)
+-  property bool rounded: Style.cornerRadius > 0
++  property bool rounded: warmGlass || Style.cornerRadius > 0
+   property color foreground: Color.foreground
+   property color accent: Color.accent
+ 
+@@ -79,20 +81,19 @@
+     height: root.trackHeight
+     anchors.centerIn: parent
+     radius: root.rounded ? height / 2 : 0
+-    color: root.checked
+-      ? Style.selectedFillFor(root.foreground, root.accent)
+-      : Style.normalFillFor(root.foreground, root.accent)
++    color: root.warmGlass ? (root.checked ? root.accent : "#262622")
++      : (root.checked ? Style.selectedFillFor(root.foreground, root.accent) : Style.normalFillFor(root.foreground, root.accent))
+     borderSpec: Border.controlSpec(root.checked ? "selected" : "normal", root.foreground, root.accent)
+ 
+     Behavior on color { ColorAnimation { duration: 120 } }
+ 
+     Rectangle {
+-      width: root.knobSize
++      width: root.warmGlass ? root.knobSize * 1.35 : root.knobSize
+       height: root.knobSize
+       radius: root.rounded ? height / 2 : 0
+       x: root.checked ? track.width - width - root.knobInset : root.knobInset
+       anchors.verticalCenter: parent.verticalCenter
+-      color: root.checked ? Style.selectedStateColor(root.foreground, root.accent) : Qt.darker(root.foreground, 1.25)
++      color: root.warmGlass ? root.foreground : (root.checked ? Style.selectedStateColor(root.foreground, root.accent) : Qt.darker(root.foreground, 1.25))
+ 
+       Behavior on x { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+       Behavior on color { ColorAnimation { duration: 120 } }
+--- a/Button.qml
++++ b/Button.qml
+@@ -1,6 +1,7 @@
+ import QtQuick
+ import QtQuick.Controls
+ import qs.Commons
++import qs.Ui
+ 
+ // The button. One component for every clickable thing in the kit.
+ // States compose independently and are applied in priority order:
+@@ -19,6 +20,7 @@
+ // can update state on mouse enter/leave.
+ BorderSurface {
+   id: root
++  readonly property bool warmGlass: Color.shellValues["warm-glass.enabled"] === "true"
+ 
+   property string text: ""
+   property string iconText: ""
+@@ -33,7 +35,7 @@
+ 
+   // Colors. Defaults track the theme; per-instance overrides are honored.
+   property color foreground: Color.foreground
+-  property color background: "transparent"
++  property color background: warmGlass && bordered ? "#191916" : "transparent"
+   property color accent: Color.accent
+ 
+   // Sizing.
+@@ -72,7 +74,7 @@
+   // relayouts neighboring controls.
+   implicitWidth: row.implicitWidth + horizontalPadding * 2 + _reservedBorderLeft + _reservedBorderRight
+   implicitHeight: row.implicitHeight + verticalPadding * 2 + _reservedBorderTop + _reservedBorderBottom
+-  radius: Style.cornerRadius
++  radius: warmGlass ? Style.space(8) : Style.cornerRadius
+ 
+   readonly property bool hot: mouseArea.containsMouse || hasCursor
+   readonly property bool _showFocusRing: focusable && activeFocus
+--- a/KeyboardPanel.qml
++++ b/KeyboardPanel.qml
+@@ -1,7 +1,9 @@
+ import QtQuick
++import QtQuick.Effects
+ import Quickshell
+ import Quickshell.Wayland
+ import qs.Commons
++import qs.Ui
+ 
+ // Layer-shell popup attached to a bar widget icon, designed for
+ // click-driven AND keyboard-driven panels (e.g. SUPER+CTRL+W summon).
+@@ -36,6 +38,7 @@
+ // popup if the user clicks a different bar icon).
+ PanelWindow {
+   id: root
++  readonly property bool warmGlass: Color.shellValues["warm-glass.enabled"] === "true"
+ 
+   required property Item anchorItem
+   required property QtObject bar
+@@ -47,7 +50,7 @@
+   property var borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
+   property bool centerOnBar: false
+   property bool open: false
+-  property int gap: Style.gapsOut  // distance between bar edge and panel
++  property int gap: warmGlass ? Math.max(Style.gapsOut, Style.space(14)) : Style.gapsOut  // distance between bar edge and panel
+   property bool popoutSwitching: false
+   property bool popoutSwitchClosing: false
+   property bool focusPrimed: false
+@@ -376,6 +379,19 @@
+ 
+   // --- card ----------------------------------------------------------------
+ 
++  RectangularShadow {
++    visible: root.warmGlass
++    x: card.x
++    y: card.y
++    width: card.width
++    height: card.height
++    radius: card.radius
++    blur: Style.space(20)
++    offset: Qt.vector2d(0, Style.space(5))
++    color: "#80000000"
++    opacity: card.opacity
++  }
++
+   BorderSurface {
+     id: card
+     x: root.cardOrigin.x
+@@ -393,6 +409,37 @@
+       NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+     }
+ 
++    Canvas {
++      id: pointer
++      visible: root.warmGlass && root.barPos === "top"
++      width: Style.space(26)
++      height: Style.space(13)
++      x: Math.max(card.radius + 2, Math.min(card.width - card.radius - width - 2,
++        root.anchorScreenPos.x + root.anchorW / 2 - card.x - width / 2))
++      y: 1 - height
++      onWidthChanged: requestPaint()
++      onHeightChanged: requestPaint()
++      onVisibleChanged: requestPaint()
++      Connections {
++        target: Color
++        function onShellValuesChanged() { pointer.requestPaint() }
++      }
++      onPaint: {
++        var ctx = getContext("2d")
++        ctx.reset()
++        ctx.beginPath()
++        ctx.moveTo(0, height)
++        ctx.lineTo(width / 2 - 2, 2)
++        ctx.quadraticCurveTo(width / 2, 0, width / 2 + 2, 2)
++        ctx.lineTo(width, height)
++        ctx.fillStyle = Color.popups.background
++        ctx.fill()
++        ctx.strokeStyle = Color.popups.border
++        ctx.lineWidth = 1
++        ctx.stroke()
++      }
++    }
++
+     // Swallow clicks on the card so they don't bubble to the dismissal
+     // MouseArea behind us.
+     MouseArea {

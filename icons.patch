@@ -1,0 +1,27 @@
+--- a/BarIconButton.qml
++++ b/BarIconButton.qml
+@@ -1,8 +1,10 @@
+ import QtQuick
+ import Quickshell
+ import qs.Commons
++import qs.Ui
++import "." as WarmIcons
+ 
+-WidgetButton {
++WarmIcons.WidgetButton {
+   id: root
+ 
+   property Component iconComponent: null
+--- a/BarIndicator.qml
++++ b/BarIndicator.qml
+@@ -1,7 +1,9 @@
+ import QtQuick
+ import qs.Commons
++import qs.Ui
++import "." as WarmIcons
+ 
+-BarIconButton {
++WarmIcons.BarIconButton {
+   id: root
+ 
+   property string moduleName: ""

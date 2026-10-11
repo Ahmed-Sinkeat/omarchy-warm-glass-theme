@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="210" viewBox="0 0 840 210">
+  <title>Warm Glass color palette</title>
+  <desc>Warm black, charcoal, ivory, muted gold, coral and blue.</desc>
+  <rect width="840" height="210" rx="18" fill="#0b0b0a"/>
+  <g font-family="sans-serif" font-size="16" fill="#e5e3da">
+    <text x="30" y="40" font-size="24">Warm Glass</text>
+    <rect x="30" y="65" width="120" height="80" rx="8" fill="#0b0b0a" stroke="#45443d"/><text x="30" y="175">#0b0b0a</text>
+    <rect x="162" y="65" width="120" height="80" rx="8" fill="#151513" stroke="#45443d"/><text x="162" y="175">#151513</text>
+    <rect x="294" y="65" width="120" height="80" rx="8" fill="#e5e3da"/><text x="294" y="175">#e5e3da</text>
+    <rect x="426" y="65" width="120" height="80" rx="8" fill="#b6aa8b"/><text x="426" y="175">#b6aa8b</text>
+    <rect x="558" y="65" width="120" height="80" rx="8" fill="#d99188"/><text x="558" y="175">#d99188</text>
+    <rect x="690" y="65" width="120" height="80" rx="8" fill="#a8b8c8"/><text x="690" y="175">#a8b8c8</text>
+  </g>
+</svg>
