@@ -1,7 +1,6 @@
 # Warm Glass
 
 A warm dark Omarchy theme: charcoal surfaces, ivory text, muted gold accents and soft transparency.
-Inspired by [this desktop](https://x.com/icanberk/status/2109031477484937571).
 
 ![Warm Glass desktop](screenshots/desktop.png)
 
