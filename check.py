@@ -37,11 +37,12 @@ assert contrast(shell["bar"]["active"], shell["bar"]["background"]) >= 3
 assert contrast(shell["bar"]["active"], palette["background"]) >= 4.5
 for surface in ("popups", "tooltip", "notifications", "menu", "launcher", "polkit", "lock"):
     assert contrast(shell[surface]["text"], shell[surface]["background"]) >= 7, surface
-wallpapers = [p for p in (root / "backgrounds").iterdir() if p.suffix == ".webp"]
+wallpapers = [p for p in (root / "backgrounds").iterdir() if p.suffix in (".webp", ".jpg")]
 assert len(wallpapers) == 18, "The selected rotation must contain all 18 wallpapers"
 for wallpaper in wallpapers:
     signature = wallpaper.read_bytes()[:8]
-    assert signature.startswith(b"RIFF") and wallpaper.read_bytes()[8:12] == b"WEBP", wallpaper
+    assert (signature.startswith(b"\xff\xd8") if wallpaper.suffix == ".jpg"
+            else signature.startswith(b"RIFF") and wallpaper.read_bytes()[8:12] == b"WEBP"), wallpaper
 assert (root / "LICENSE").is_file()
 assert not list(root.rglob("*.dmg")), "Reference downloads must stay outside the release"
 ET.parse(root / "preview.svg")
