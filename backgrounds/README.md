@@ -1,6 +1,6 @@
 # Wallpapers
 
-These 18 images are the user's selected wallpaper rotation, copied unchanged from their collection.
+These 18 images are the user's selected wallpaper rotation, re-encoded to WebP (max 4K wide) from their collection.
 Matching filenames appear in [orangc's wallpaper collection](https://github.com/orangci/walls)
 and its [Catppuccin Mocha version](https://github.com/orangci/walls-catppuccin-mocha).
 The numeric filename prefixes preserve the selected order.
