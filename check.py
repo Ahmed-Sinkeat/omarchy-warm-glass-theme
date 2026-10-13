@@ -81,6 +81,7 @@ with tempfile.TemporaryDirectory(prefix="warm-glass-templates-") as tmp:
     subprocess.run(["luac", "-p", str(staging / "hyprland.lua")], check=True)
     subprocess.run(["bash", "-n", str(root / "install.sh")], check=True)
     subprocess.run(["bash", "-n", str(root / "install-simple.sh")], check=True)
+    subprocess.run(["bash", "-n", str(root / "uninstall.sh")], check=True)
 
     # Run Omarchy's real generator, pointing only its staging directory at /tmp.
     generator = (omarchy / "bin/omarchy-theme-set-templates").read_text()
